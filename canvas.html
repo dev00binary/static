@@ -31,6 +31,36 @@
           this.isDrawStart = false;
           this.fullHeight = window.innerHeight - 20;
           this.drawImageParams = [];
+          this.img = new Image();
+
+          window.addEventListener("paste", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const file = e.clipboardData.items[0].getAsFile();
+            const objectUrl = URL.createObjectURL(file);
+
+            this.img.src = objectUrl;
+            this.img.onload = () => {
+              this.canvas.height =
+                this.img.height > this.fullHeight
+                  ? this.fullHeight
+                  : this.img.height;
+              this.canvas.width =
+                (this.canvas.height * this.img.width) / this.img.height;
+
+              this.drawImageParams = [
+                this.img,
+                0,
+                0,
+                this.canvas.width,
+                this.canvas.height,
+              ];
+
+              this.clearAll();
+              this.context.drawImage(...this.drawImageParams);
+            };
+          });
 
           this.canvas.addEventListener("mousedown", (e) => {
             this.startPosition = this.getClientOffset(e);
@@ -137,34 +167,7 @@
       }
 
       document.addEventListener("DOMContentLoaded", () => {
-        const cv = new Canvas(document.querySelector("canvas"));
-
-        window.addEventListener("paste", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-
-          const file = e.clipboardData.items[0].getAsFile();
-          const objectUrl = URL.createObjectURL(file);
-
-          const img = new Image();
-          img.src = objectUrl;
-          img.onload = () => {
-            const fullHeight = window.innerHeight - 20;
-            cv.canvas.height = img.height > fullHeight ? fullHeight : img.height;
-            cv.canvas.width = (cv.canvas.height * img.width) / img.height;
-
-            cv.drawImageParams = [
-              img,
-              0,
-              0,
-              cv.canvas.width,
-              cv.canvas.height
-            ]
-
-            cv.ctx.clearRect(0, 0, cv.canvas.width, cv.canvas.height);
-            cv.ctx.drawImage(img, 0, 0, cv.canvas.width, cv.canvas.height);
-          };
-        });
+        new Canvas(document.querySelector("canvas"));
       });
     </script>
   </body>

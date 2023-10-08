@@ -5,13 +5,18 @@
   <title>Canvas</title>
   <style>
     button {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .container {
+      display: block;
       margin-left: auto;
       margin-right: auto;
     }
 
     canvas {
-      margin-left: auto;
-      margin-left: auto;
       border: 1px solid;
       height: 80vh;
       width: 50%;
@@ -20,9 +25,9 @@
 </head>
 <body>
   <button>Paste from Clipboard</button>
-  <canvas></canvas>
-
-  <!--  -->
+  <div class="container">
+    <canvas></canvas>
+  </div>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {

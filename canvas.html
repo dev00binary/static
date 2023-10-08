@@ -34,24 +34,20 @@
       const ctx = canvas.getContext("2d");
       const pasteButton = document.querySelector("button");
 
-      pasteButton.addEventListener("click", () => {
-        const tempInput = document.createElement("input");
-        tempInput.style.position = "fixed";
-        tempInput.style.opacity = 0;
-        document.body.appendChild(tempInput);
-        tempInput.focus();
+      window.addEventListener("paste", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
 
-        document.execCommand("paste");
-        const clipboardData = tempInput.value;
-        document.body.removeChild(tempInput);
+        const file = e.clipboardData.items[0].getAsFile();
+        const objectUrl = URL.createObjectURL(file);
 
         const img = new Image();
-        img.src = clipboardData;
+        img.src = objectUrl;
         img.onload = () => {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
         }
-      })
+      });
     });
   </script>
 </body>

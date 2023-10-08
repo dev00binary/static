@@ -1,37 +1,35 @@
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <style>
-    .header {
-      display: flex;
-      gap: 1rem;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-    }
-    .container {
-      display: flex;
-      justify-content: center;
-    }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <select name="username" id="username">
-      <option value="" disabled selected>--select--</option>
-      <option value="random">--random--</option>
-    </select>
-    <input type="file" name="folder" id="folder" webkitdirectory />
-    <span id="count" style="display: none;">
-      <span id="progress" contenteditable=""></span>
-      /
-      <span id="total"></span>
-    </span>
-  </div>
-  <div class="container">
-    
-  </div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Instadl</title>
+    <style>
+      .header {
+        display: flex;
+        gap: 1rem;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+      .container {
+        display: flex;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <select name="username" id="username">
+        <option value="" disabled selected>--select--</option>
+        <option value="random">--random--</option>
+      </select>
+      <input type="file" name="folder" id="folder" webkitdirectory />
+      <span id="count" style="display: none;">
+        <span id="progress" contenteditable=""></span>
+        /
+        <span id="total"></span>
+      </span>
+    </div>
+    <div class="container"></div>
+  </body>
 </html>

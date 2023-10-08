@@ -35,18 +35,22 @@
       const pasteButton = document.querySelector("button");
 
       pasteButton.addEventListener("click", () => {
-        navigator.clipboard.readText()
-          .then((text) => {
-            const img = new Image();
-            img.src = text;
-            img.onload = () => {
-              ctx.clearRect(0, 0, canvas.width, canvas.height);
-              ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-            }
-          })
-          .catch((err) => {
-            console.error("Error reading clipboard text: " + err);
-          })
+        const tempInput = document.createElement("input");
+        tempInput.style.position = "fixed";
+        tempInput.style.opacity = 0;
+        document.body.appendChild(tempInput);
+        tempInput.focus();
+
+        document.execCommand("paste");
+        const clipboardData = tempInput.value;
+        document.body.removeChild(tempInput);
+
+        const img = new Image();
+        img.src = clipboardData;
+        img.onload = () => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+        }
       })
     });
   </script>

@@ -10,6 +10,12 @@
       align-items: center;
     }
 
+    .item {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
     canvas {
       border: 1px solid;
       height: 98vh;
@@ -18,7 +24,10 @@
 </head>
 <body>
   <div class="container">
-    <canvas></canvas>
+    <div class="item">
+      <button>Paste from Clipboard</button>
+      <canvas></canvas>
+    </div>
   </div>
 </body>
 </html>

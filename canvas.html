@@ -161,8 +161,8 @@
               cv.canvas.height
             ]
 
-            cv.clearAll();
-            cv.ctx.drawImage(...drawImageParams);
+            cv.ctx.clearRect(0, 0, cv.canvas.width, cv.canvas.height);
+            cv.ctx.drawImage(img, 0, 0, cv.canvas.width, cv.canvas.height);
           };
         });
       });

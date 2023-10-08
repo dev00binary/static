@@ -1,52 +1,171 @@
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Canvas</title>
-  <style>
-    button {
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Canvas</title>
+    <style>
+      button {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
 
-    .container {
-      display: flex;
-      justify-content: center;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <canvas style="border: 1px solid;"></canvas>
-  </div>
+      .container {
+        display: flex;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <canvas style="border: 1px solid;"></canvas>
+    </div>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const canvas = document.querySelector("canvas");
-      const ctx = canvas.getContext("2d");
+    <script>
+      class Canvas {
+        constructor(canvas) {
+          this.canvas = canvas;
+          this.context = canvas.getContext("2d");
+          this.startPosition = { x: 0, y: 0 };
+          this.endPosition = { x: 0, y: 0 };
+          this.isDrawStart = false;
+          this.fullHeight = window.innerHeight - 20;
+          this.drawImageParams = [];
 
-      window.addEventListener("paste", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+          this.canvas.addEventListener("mousedown", (e) => {
+            this.startPosition = this.getClientOffset(e);
+            this.isDrawStart = true;
+          });
 
-        const file = e.clipboardData.items[0].getAsFile();
-        const objectUrl = URL.createObjectURL(file);
+          this.canvas.addEventListener("mousemove", (e) => {
+            if (!this.isDrawStart) return;
 
-        const img = new Image();
-        img.src = objectUrl;
-        img.onload = () => {
-          const fullHeight = window.innerHeight;
-          canvas.height = img.height > fullHeight ? fullHeight : img.height;
-          canvas.width = canvas.height * img.width / img.height;
+            this.redrawImage();
 
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+            const clientOffset = this.getClientOffset(e);
+            this.endPosition.y = clientOffset.y;
+            this.drawStraightLine();
+          });
+
+          this.canvas.addEventListener("mouseup", (e) => {
+            this.isDrawStart = false;
+            this.endPosition = this.getClientOffset(e);
+
+            const noMove =
+              this.startPosition.x === this.endPosition.x &&
+              this.startPosition.y === this.endPosition.y;
+
+            if (noMove) return;
+
+            this.drawRuler();
+          });
         }
+
+        getClientOffset(event) {
+          const { pageX, pageY } = event;
+          const x = pageX - this.canvas.offsetLeft;
+          const y = pageY - this.canvas.offsetTop;
+
+          return { x, y };
+        }
+
+        clearAll() {
+          this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+
+        drawLine(width = 3) {
+          this.context.beginPath();
+          this.context.moveTo(this.startPosition.x, this.startPosition.y);
+          this.context.lineTo(this.endPosition.x, this.endPosition.y);
+
+          this.context.strokeStyle = "red";
+          this.context.fillStyle = "red";
+          this.context.lineWidth = width;
+          this.context.stroke();
+        }
+
+        drawStraightLine() {
+          this.endPosition = {
+            x: this.startPosition.x,
+            y: this.endPosition.y,
+          };
+
+          this.drawLine();
+        }
+
+        drawRuler() {
+          const [feet, inch] = prompt("Height")
+            .split("-")
+            .map((el) => parseInt(el));
+
+          const height = this.endPosition.y - this.startPosition.y;
+          const inches = feet * 12 + inch;
+
+          for (let i = 0; i <= inches; i++) {
+            const isFeet = i % 12 === 0;
+            const isHalfFeet = i % 12 === 6;
+
+            const xOffset = isFeet ? 20 : isHalfFeet ? 15 : 10;
+            const yOffset = i === 0 ? 0 : height / inches;
+            const width = isFeet ? 3 : isHalfFeet ? 2 : 1;
+
+            this.startPosition = {
+              x: this.startPosition.x,
+              y: this.endPosition.y - yOffset,
+            };
+            this.endPosition = {
+              x: this.startPosition.x + xOffset,
+              y: this.endPosition.y - yOffset,
+            };
+            this.drawLine(width);
+
+            if (isFeet) {
+              this.context.font = "12px Arial";
+              this.context.fillText(
+                `${i / 12}`,
+                this.endPosition.x,
+                this.endPosition.y
+              );
+            }
+          }
+        }
+
+        redrawImage() {
+          this.clearAll();
+          this.context.drawImage(...this.drawImageParams);
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const cv = new Canvas(document.querySelector("canvas"));
+
+        window.addEventListener("paste", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          const file = e.clipboardData.items[0].getAsFile();
+          const objectUrl = URL.createObjectURL(file);
+
+          const img = new Image();
+          img.src = objectUrl;
+          img.onload = () => {
+            const fullHeight = window.innerHeight - 20;
+            cv.canvas.height = img.height > fullHeight ? fullHeight : img.height;
+            cv.canvas.width = (cv.canvas.height * img.width) / img.height;
+
+            cv.drawImageParams = [
+              img,
+              0,
+              0,
+              cv.canvas.width,
+              cv.canvas.height
+            ]
+
+            cv.clearAll();
+            cv.ctx.drawImage(...drawImageParams);
+          };
+        });
       });
-
-
-    });
-  </script>
-</body>
+    </script>
+  </body>
 </html>

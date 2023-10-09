@@ -26,10 +26,6 @@
   </head>
   <body>
     <div class="header">
-      <select name="username" id="username">
-        <option value="" disabled selected>--select--</option>
-        <option value="random">--random--</option>
-      </select>
       <input type="text" name="dirpath" id="dirpath">
       <input type="file" name="files" id="files" webkitdirectory />
       <span id="count" style="display: none;">
@@ -53,8 +49,11 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", () => {
-        const inputFolder = document.getElementById("folder");
-
+        const inputDirpath = document.getElementById("dirpath");
+        inputDirpath.value = localStorage.getItem("dirpath");
+        inputDirpath.addEventListener("change", (e) => {
+          localStorage.setItem("dirpath", e.target.value);
+        });
       });
     </script>
   </body>

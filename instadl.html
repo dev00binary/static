@@ -56,6 +56,11 @@
         inputDirpath.addEventListener("change", (e) => {
           localStorage.setItem("dirpath", e.target.value);
         });
+
+        const inputFiles = document.getElementById("files");
+        inputFiles.addEventListener("change", (e) => {
+          console.log(e.target.files);
+        });
       });
     </script>
   </body>

@@ -25,7 +25,8 @@
         border: 1px solid;
       }
 
-      img {
+      img,
+      video {
         display: block;
         margin: auto;
         height: auto;
@@ -41,43 +42,145 @@
   </head>
   <body>
     <div class="header">
-      <input type="text" name="dirpath" id="dirpath" />
       <input type="file" name="files" id="files" webkitdirectory />
+      <a href="#" target="_blank" id="username"></a>
       <span id="count" style="display: none;">
         <span id="progress" contenteditable=""></span>
         /
         <span id="total"></span>
+        <button id="prev">&lt;</button>
+        <button id="next">&gt;</button>
       </span>
     </div>
-    <div class="container">
-      <div class="item">
-        <img
-          src="file:///C:/Users/Test/Documents/visuals/instadl/___mel.10_/post,1664812640,CjQeWi1Mmbc,1,p.jpg"
-          alt=""
-        />
-      </div>
-      <div class="item"></div>
-      <div class="item"></div>
-      <div class="item"></div>
-      <div class="item"></div>
-      <div class="item"></div>
-      <div class="item"></div>
-      <div class="item"></div>
-      <div class="item"></div>
-      <div class="item"></div>
-    </div>
+    <div class="container"></div>
 
     <script>
+      let files = [];
+      let baseUrl = window.location.href.replace(/(.*)\/.*/, "$1") + "/visuals/instadl";
+      let username = "";
+      let pageSize = 9;
+
+      function handleProgress(progress) {
+        const data = JSON.parse(
+          localStorage.getItem("instadl") || `{"progress":{}}`
+        );
+
+        if (progress !== undefined) {
+          if (progress === 0) {
+            delete data.progress[username];
+          } else {
+            data.progress[username] = progress;
+          }
+          localStorage.setItem("instadl", JSON.stringify(data));
+        } else {
+          return data.progress[username];
+        }
+      }
+
+      function updateSrc(start) {
+        const container = document.querySelector(".container");
+        while (container.hasChildNodes()) {
+          container.removeChild(container.lastChild);
+        }
+
+        const end = start + pageSize - 1;
+        for (let i = start - 1; i < end; i++) {
+          if (files[i]) {
+            const item = document.createElement("div");
+            item.classList.add("item");
+
+            const a = document.createElement("a");
+            a.href = `${baseUrl}/${files[i].path}`;
+
+            const src = `${baseUrl}/${files[i].path}`;
+            if (src.endsWith(".jpg")) {
+              const img = document.createElement("img");
+              img.src = src;
+              a.appendChild(img);
+              if (src.endsWith("-v.jpg") || src.endsWith(",v.jpg")) {
+                item.style.borderWidth = "3px";
+              }
+            } else if (src.endsWith(".mp4")) {
+              const vid = document.createElement("video");
+              vid.src = src;
+              item.style.borderWidth = "3px";
+              a.appendChild(vid);
+            }
+
+            item.appendChild(a);
+            container.appendChild(item);
+          }
+        }
+
+        const total = parseInt(document.getElementById("total").textContent);
+        const progress = end > total ? total : end;
+        document.getElementById("progress").textContent = progress;
+
+        handleProgress(progress);
+      }
+
       document.addEventListener("DOMContentLoaded", () => {
-        const inputDirpath = document.getElementById("dirpath");
-        inputDirpath.value = localStorage.getItem("dirpath");
-        inputDirpath.addEventListener("change", (e) => {
-          localStorage.setItem("dirpath", e.target.value);
+        const usernameSpan = document.getElementById("username");
+        const progressSpan = document.getElementById("progress");
+        const totalSpan = document.getElementById("total");
+
+        const filesInput = document.getElementById("files");
+        filesInput.addEventListener("change", (e) => {
+          files = [...e.target.files]
+            .filter((el) => !el.name.endsWith(".json"))
+            .map((el) => ({
+              path: el.webkitRelativePath,
+              time: parseInt(el.name.split(",")[1]),
+            }))
+            .sort((a, b) => b.time - a.time);
+
+          document.getElementById("count").style.display = "";
+          progressSpan.textContent = pageSize;
+          totalSpan.textContent = files.length;
+
+          const progress = handleProgress() - 9 || 1;
+          prevButton.disabled = progress === 1;
+          updateSrc(progress);
+
+          username = files[0].path.split("/")[0];
+          usernameSpan.textContent = username;
+          usernameSpan.href = "https://www.instagram.com/" + username;
         });
 
-        const inputFiles = document.getElementById("files");
-        inputFiles.addEventListener("change", (e) => {
-          console.log(e.target.files);
+        const prevButton = document.getElementById("prev");
+        prevButton.addEventListener("click", () => {
+          const total = parseInt(totalSpan.textContent);
+          const progress = parseInt(progressSpan.textContent);
+          const start =
+            total !== progress
+              ? progress - (2 * pageSize - 1)
+              : Math.floor(progress / pageSize - 1) * pageSize + 1;
+
+          prevButton.disabled = start === 1;
+          nextButton.disabled = start + (pageSize - 1) > total;
+
+          updateSrc(start);
+        });
+
+        const nextButton = document.getElementById("next");
+        nextButton.addEventListener("click", () => {
+          const start = parseInt(progressSpan.textContent) + 1;
+
+          prevButton.disabled = start <= 1;
+          nextButton.disabled =
+            start + (pageSize - 1) > parseInt(totalSpan.textContent);
+
+          updateSrc(start);
+        });
+
+        progressSpan.addEventListener("blur", (e) => {
+          const start = parseInt(e.target.textContent) - (pageSize - 1);
+
+          prevButton.disabled = start <= 1;
+          nextButton.disabled =
+            start + (pageSize - 1) > parseInt(totalSpan.textContent);
+
+          updateSrc(start);
         });
       });
     </script>

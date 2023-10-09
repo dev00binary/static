@@ -11,22 +11,37 @@
         align-items: center;
         margin-bottom: 1rem;
       }
+
       .container {
         display: flex;
         gap: 1rem;
         flex-wrap: wrap;
         justify-content: space-evenly;
       }
+
       .item {
         width: 258px;
         height: 258px;
         border: 1px solid;
       }
+
+      img {
+        display: block;
+        margin: auto;
+        height: auto;
+        width: auto;
+        max-height: 100%;
+        max-width: 100%;
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+        -webkit-transform: translateY(-50%);
+      }
     </style>
   </head>
   <body>
     <div class="header">
-      <input type="text" name="dirpath" id="dirpath">
+      <input type="text" name="dirpath" id="dirpath" />
       <input type="file" name="files" id="files" webkitdirectory />
       <span id="count" style="display: none;">
         <span id="progress" contenteditable=""></span>
@@ -36,7 +51,10 @@
     </div>
     <div class="container">
       <div class="item">
-        <img src="file:///C:/Users/Test/Documents/visuals/instadl/___mel.10_/post,1664812640,CjQeWi1Mmbc,1,p.jpg" alt="" />
+        <img
+          src="file:///C:/Users/Test/Documents/visuals/instadl/___mel.10_/post,1664812640,CjQeWi1Mmbc,1,p.jpg"
+          alt=""
+        />
       </div>
       <div class="item"></div>
       <div class="item"></div>

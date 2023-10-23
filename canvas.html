@@ -134,9 +134,7 @@
           ticks = parseInt(input);
           div = 10;
         } else {
-          const [feet, inch] = prompt("Height")
-            .split("-")
-            .map((el) => parseInt(el))
+          const [feet, inch] = input.split("-").map((el) => parseInt(el))
           ticks = feet * 12 + inch
           div = 12
         }

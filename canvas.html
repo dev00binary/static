@@ -1,174 +1,187 @@
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Canvas (v.0.0)</title>
-    <style>
-      button {
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-      }
 
-      .container {
-        display: flex;
-        justify-content: center;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <canvas style="border: 1px solid;"></canvas>
-    </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Canvas (v.0.0)</title>
+  <style>
+    button {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
 
-    <script>
-      class Canvas {
-        constructor(canvas) {
-          this.canvas = canvas;
-          this.context = canvas.getContext("2d");
-          this.startPosition = { x: 0, y: 0 };
-          this.endPosition = { x: 0, y: 0 };
-          this.isDrawStart = false;
-          this.fullHeight = window.innerHeight - 20;
-          this.drawImageParams = [];
-          this.img = new Image();
+    .container {
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+</head>
 
-          window.addEventListener("paste", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
+<body>
+  <div class="container">
+    <canvas style="border: 1px solid;"></canvas>
+  </div>
 
-            const file = e.clipboardData.items[0].getAsFile();
-            const objectUrl = URL.createObjectURL(file);
+  <script>
+    class Canvas {
+      constructor(canvas) {
+        this.canvas = canvas;
+        this.context = canvas.getContext("2d");
+        this.startPosition = { x: 0, y: 0 };
+        this.endPosition = { x: 0, y: 0 };
+        this.isDrawStart = false;
+        this.fullHeight = window.innerHeight - 20;
+        this.drawImageParams = [];
+        this.img = new Image();
 
-            this.img.src = objectUrl;
-            this.img.onload = () => {
-              this.canvas.height =
-                this.img.height > this.fullHeight
-                  ? this.fullHeight
-                  : this.img.height;
-              this.canvas.width =
-                (this.canvas.height * this.img.width) / this.img.height;
+        window.addEventListener("paste", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
 
-              this.drawImageParams = [
-                this.img,
-                0,
-                0,
-                this.canvas.width,
-                this.canvas.height,
-              ];
+          const file = e.clipboardData.items[0].getAsFile();
+          const objectUrl = URL.createObjectURL(file);
 
-              this.clearAll();
-              this.context.drawImage(...this.drawImageParams);
-            };
-          });
+          this.img.src = objectUrl;
+          this.img.onload = () => {
+            this.canvas.height =
+              this.img.height > this.fullHeight
+                ? this.fullHeight
+                : this.img.height;
+            this.canvas.width =
+              (this.canvas.height * this.img.width) / this.img.height;
 
-          this.canvas.addEventListener("mousedown", (e) => {
-            this.startPosition = this.getClientOffset(e);
-            this.isDrawStart = true;
-          });
+            this.drawImageParams = [
+              this.img,
+              0,
+              0,
+              this.canvas.width,
+              this.canvas.height,
+            ];
 
-          this.canvas.addEventListener("mousemove", (e) => {
-            if (!this.isDrawStart) return;
-
-            this.redrawImage();
-
-            const clientOffset = this.getClientOffset(e);
-            this.endPosition.y = clientOffset.y;
-            this.drawStraightLine();
-          });
-
-          this.canvas.addEventListener("mouseup", (e) => {
-            this.isDrawStart = false;
-            this.endPosition = this.getClientOffset(e);
-
-            const noMove =
-              this.startPosition.x === this.endPosition.x &&
-              this.startPosition.y === this.endPosition.y;
-
-            if (noMove) return;
-
-            this.drawRuler();
-          });
-        }
-
-        getClientOffset(event) {
-          const { pageX, pageY } = event;
-          const x = pageX - this.canvas.offsetLeft;
-          const y = pageY - this.canvas.offsetTop;
-
-          return { x, y };
-        }
-
-        clearAll() {
-          this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        }
-
-        drawLine(width = 3) {
-          this.context.beginPath();
-          this.context.moveTo(this.startPosition.x, this.startPosition.y);
-          this.context.lineTo(this.endPosition.x, this.endPosition.y);
-
-          this.context.strokeStyle = "red";
-          this.context.fillStyle = "red";
-          this.context.lineWidth = width;
-          this.context.stroke();
-        }
-
-        drawStraightLine() {
-          this.endPosition = {
-            x: this.startPosition.x,
-            y: this.endPosition.y,
+            this.clearAll();
+            this.context.drawImage(...this.drawImageParams);
           };
+        });
 
-          this.drawLine();
-        }
+        this.canvas.addEventListener("mousedown", (e) => {
+          this.startPosition = this.getClientOffset(e);
+          this.isDrawStart = true;
+        });
 
-        drawRuler() {
+        this.canvas.addEventListener("mousemove", (e) => {
+          if (!this.isDrawStart) return;
+
+          this.redrawImage();
+
+          const clientOffset = this.getClientOffset(e);
+          this.endPosition.y = clientOffset.y;
+          this.drawStraightLine();
+        });
+
+        this.canvas.addEventListener("mouseup", (e) => {
+          this.isDrawStart = false;
+          this.endPosition = this.getClientOffset(e);
+
+          const noMove =
+            this.startPosition.x === this.endPosition.x &&
+            this.startPosition.y === this.endPosition.y;
+
+          if (noMove) return;
+
+          this.drawRuler();
+        });
+      }
+
+      getClientOffset(event) {
+        const { pageX, pageY } = event;
+        const x = pageX - this.canvas.offsetLeft;
+        const y = pageY - this.canvas.offsetTop;
+
+        return { x, y };
+      }
+
+      clearAll() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      }
+
+      drawLine(width = 3) {
+        this.context.beginPath();
+        this.context.moveTo(this.startPosition.x, this.startPosition.y);
+        this.context.lineTo(this.endPosition.x, this.endPosition.y);
+
+        this.context.strokeStyle = "red";
+        this.context.fillStyle = "red";
+        this.context.lineWidth = width;
+        this.context.stroke();
+      }
+
+      drawStraightLine() {
+        this.endPosition = {
+          x: this.startPosition.x,
+          y: this.endPosition.y,
+        };
+
+        this.drawLine();
+      }
+
+      drawRuler() {
+        const input = prompt("Height");
+        const isMetric = !input.includes("-");
+        let ticks, div;
+
+        if (isMetric) {
+          ticks = parseInt(input);
+          div = 10;
+        } else {
           const [feet, inch] = prompt("Height")
             .split("-")
-            .map((el) => parseInt(el));
-
-          const height = this.endPosition.y - this.startPosition.y;
-          const inches = feet * 12 + inch;
-
-          for (let i = 0; i <= inches; i++) {
-            const isFeet = i % 12 === 0;
-            const isHalfFeet = i % 12 === 6;
-
-            const xOffset = isFeet ? 20 : isHalfFeet ? 15 : 10;
-            const yOffset = i === 0 ? 0 : height / inches;
-            const width = isFeet ? 3 : isHalfFeet ? 2 : 1;
-
-            this.startPosition = {
-              x: this.startPosition.x,
-              y: this.endPosition.y - yOffset,
-            };
-            this.endPosition = {
-              x: this.startPosition.x + xOffset,
-              y: this.endPosition.y - yOffset,
-            };
-            this.drawLine(width);
-
-            if (isFeet) {
-              this.context.font = "12px Arial";
-              this.context.fillText(
-                `${i / 12}`,
-                this.endPosition.x,
-                this.endPosition.y
-              );
-            }
-          }
+            .map((el) => parseInt(el))
+          ticks = feet * 12 + inch
+          div = 12
         }
 
-        redrawImage() {
-          this.clearAll();
-          this.context.drawImage(...this.drawImageParams);
+        const height = this.endPosition.y - this.startPosition.y;
+
+        for (let i = 0; i <= ticks; i++) {
+          const isFull = i % div === 0;
+          const isHalf = i % div === div / 2;
+
+          const xOffset = isFull ? 20 : isHalf ? 15 : 10;
+          const yOffset = i === 0 ? 0 : height / ticks;
+          const width = isFull ? 3 : isHalf ? 2 : 1;
+
+          this.startPosition = {
+            x: this.startPosition.x,
+            y: this.endPosition.y - yOffset,
+          };
+          this.endPosition = {
+            x: this.startPosition.x + xOffset,
+            y: this.endPosition.y - yOffset,
+          };
+          this.drawLine(width);
+
+          if (isFull) {
+            this.context.font = "12px Arial";
+            this.context.fillText(
+              isMetric ? `${i}` : `${i / 12}`,
+              this.endPosition.x,
+              this.endPosition.y
+            );
+          }
         }
       }
 
-      document.addEventListener("DOMContentLoaded", () => {
-        new Canvas(document.querySelector("canvas"));
-      });
-    </script>
-  </body>
+      redrawImage() {
+        this.clearAll();
+        this.context.drawImage(...this.drawImageParams);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      new Canvas(document.querySelector("canvas"));
+    });
+  </script>
+</body>
+
 </html>

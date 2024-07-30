@@ -1,0 +1,50 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Olympic 2024</title>
+    <style>
+      .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <button id="test">Test</button>
+    </div>
+
+    <script>
+      const urlApi =
+        "https://us-east-2.aws.data.mongodb-api.com/app/data-zoosd/endpoint/data/v1";
+      const apikey =
+        "vHQYXm5Ni1KB0IrCAiLb5rxwRF1OKFqWSGsI2WnDnXlvIwvE18NW8OdJ13AEqvAB";
+
+      document.getElementById("test").addEventListener("click", () => {
+        fetch(urlApi + "/action/aggregate", {
+          method: "POST",
+          headers: {
+            apikey,
+            "Content-Type": "application/ejson",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            dataSource: "scraping",
+            database: "scraping",
+            collection: "olympics",
+            pipeline: [
+              {
+                $group: {
+                  _id: { disciplines: "$disciplines" },
+                },
+              },
+            ],
+          }),
+        }).then(console.log);
+      });
+    </script>
+  </body>
+</html>
